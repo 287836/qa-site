@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>随便问问</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#f6f6f2;
+  --surface:#fff;
+  --border:#e2e2dc;
+  --text:#1a1a1a;
+  --text2:#787872;
+  --accent:#2563eb;
+  --accent-hover:#1d4ed8;
+  --vote:#dc2626;
+  --radius:8px;
+}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+body{
+  font-family:'Inter',-apple-system,sans-serif;
+  background:var(--bg);
+  color:var(--text);
+  line-height:1.5;
+  -webkit-font-smoothing:antialiased;
+}
+.site-header{
+  background:var(--surface);
+  border-bottom:1px solid var(--border);
+  padding:16px 24px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  position:sticky; top:0; z-index:100;
+}
+.site-header h1{font-size:18px;font-weight:700;letter-spacing:-0.3px}
+.site-header h1 span{color:var(--accent)}
+.btn{
+  display:inline-flex;align-items:center;gap:6px;
+  padding:8px 18px;border:none;border-radius:var(--radius);
+  font-size:14px;font-weight:500;cursor:pointer;transition:all 0.15s;
+}
+.btn-primary{background:var(--accent);color:#fff}
+.btn-primary:hover{background:var(--accent-hover)}
+.btn-outline{
+  background:transparent;color:var(--text2);border:1px solid var(--border);
+}
+.btn-outline:hover{background:var(--bg);color:var(--text)}
+.btn-sm{padding:5px 12px;font-size:13px}
+.container{max-width:720px;margin:0 auto;padding:24px 20px}
+.sort-bar{
+  display:flex;gap:4px;margin-bottom:16px;
+  background:var(--surface);padding:4px;
+  border-radius:var(--radius);border:1px solid var(--border);
+}
+.sort-btn{
+  flex:1;padding:7px 16px;border:none;border-radius:6px;
+  background:transparent;font-size:13px;font-weight:500;
+  color:var(--text2);cursor:pointer;transition:all 0.15s;
+}
+.sort-btn.active{background:var(--accent);color:#fff}
+.sort-btn:not(.active):hover{color:var(--text);background:var(--bg)}
+.q-card{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:var(--radius);margin-bottom:8px;transition:box-shadow 0.15s;
+}
+.q-card:hover{border-color:#d0d0c8}
+.q-card-header{display:flex;gap:14px;padding:16px 20px;cursor:pointer;user-select:none}
+.q-vote{
+  display:flex;flex-direction:column;align-items:center;
+  gap:2px;flex-shrink:0;width:36px;
+}
+.q-vote button{
+  background:none;border:none;cursor:pointer;
+  font-size:16px;padding:2px;color:var(--text2);
+  transition:color 0.1s;line-height:1;
+}
+.q-vote button:hover{color:var(--vote)}
+.q-vote .count{font-size:14px;font-weight:700;color:var(--text);min-width:20px;text-align:center}
+.q-main{flex:1;min-width:0}
+.q-title{font-size:15px;font-weight:600;margin-bottom:4px;line-height:1.4}
+.q-body{
+  font-size:14px;color:var(--text2);margin-bottom:8px;line-height:1.5;
+  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;
+}
+.q-meta{display:flex;align-items:center;gap:12px;font-size:12px;color:var(--text2)}
+.q-meta .count-wrap{display:flex;align-items:center;gap:4px}
+.q-expanded{display:none}
+.q-card.expanded .q-expanded{display:block}
+.answers-section{border-top:1px solid var(--border);padding:16px 20px 16px 70px}
+.a-item{padding:12px 0;border-bottom:1px solid var(--border)}
+.a-item:last-child{border-bottom:none}
+.a-body{font-size:14px;line-height:1.6;margin-bottom:6px}
+.a-meta{font-size:12px;color:var(--text2)}
+.a-count{font-size:12px;font-weight:500;color:var(--text2);margin-bottom:10px}
+.answer-form textarea,.question-form textarea,.question-form input[type="text"]{
+  width:100%;padding:10px 14px;border:1px solid var(--border);
+  border-radius:6px;font-size:14px;font-family:inherit;resize:vertical;
+  transition:border-color 0.15s;outline:none;
+}
+.answer-form textarea:focus,.question-form textarea:focus,.question-form input:focus{border-color:var(--accent)}
+.answer-form textarea{min-height:70px;margin-bottom:8px}
+.answer-form{display:flex;flex-direction:column}
+.modal-overlay{
+  display:none;position:fixed;inset:0;
+  background:rgba(0,0,0,0.4);z-index:200;
+  justify-content:center;align-items:flex-start;padding-top:80px;
+}
+.modal-overlay.open{display:flex}
+.modal{
+  background:var(--surface);border-radius:10px;width:90%;
+  max-width:560px;padding:28px;box-shadow:0 20px 60px rgba(0,0,0,0.15);
+}
+.modal h2{font-size:18px;font-weight:600;margin-bottom:16px}
+.question-form{display:flex;flex-direction:column;gap:10px}
+.question-form label{font-size:13px;font-weight:500;color:var(--text2)}
+.question-form input{font-size:15px}
+.question-form textarea{min-height:100px}
+.form-actions{display:flex;gap:8px;justify-content:flex-end;margin-top:4px}
+.empty-state{text-align:center;padding:60px 20px;color:var(--text2)}
+.empty-state .icon{font-size:40px;margin-bottom:12px;opacity:0.3}
+.empty-state h3{font-size:16px;margin-bottom:6px;color:var(--text)}
+.empty-state p{font-size:14px}
+.toast{
+  position:fixed;bottom:24px;left:50%;
+  transform:translateX(-50%) translateY(80px);
+  background:var(--text);color:#fff;padding:10px 20px;
+  border-radius:var(--radius);font-size:13px;opacity:0;
+  transition:all 0.3s;pointer-events:none;z-index:300;
+}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.loading{text-align:center;padding:32px;color:var(--text2);font-size:14px}
+.del-btn{
+  background:none;border:none;color:var(--text2);
+  cursor:pointer;font-size:14px;padding:2px 4px;
+  opacity:0.3;transition:opacity 0.15s;line-height:1;
+}
+.del-btn:hover{opacity:1;color:#dc2626}
+.q-card:hover .del-btn{opacity:0.7}
+@media(max-width:600px){
+  .site-header{padding:12px 16px}
+  .site-header h1{font-size:16px}
+  .container{padding:16px 12px}
+  .q-card-header{padding:14px 16px}
+  .answers-section{padding:14px 16px 14px 50px}
+  .modal{padding:20px;width:95%}
+}
+</style>
+</head>
+<body>
+<header class="site-header">
+  <h1><span>?</span> 随便问问</h1>
+  <button class="btn btn-primary" onclick="openForm()">+ 提问</button>
+</header>
+<main class="container" id="app">
+  <div class="sort-bar">
+    <button class="sort-btn active" data-sort="newest" onclick="switchSort('newest')">最新</button>
+    <button class="sort-btn" data-sort="popular" onclick="switchSort('popular')">最热</button>
+  </div>
+  <div id="q-list"></div>
+</main>
+<div class="modal-overlay" id="askModal" onclick="if(event.target===this)closeForm()">
+  <div class="modal">
+    <h2>提个问题</h2>
+    <div class="question-form">
+      <label>问题标题</label>
+      <input type="text" id="qTitle" placeholder="你想问什么？" maxlength="200">
+      <label>补充说明（可选）</label>
+      <textarea id="qBody" placeholder="补充一些背景信息……" maxlength="2000"></textarea>
+      <div class="form-actions">
+        <button class="btn btn-outline" onclick="closeForm()">取消</button>
+        <button class="btn btn-primary" onclick="submitQuestion()">发布</button>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+<script>
+var currentSort = 'newest';
+var questions = [];
+function load(){
+  var el = document.getElementById('q-list');
+  el.innerHTML = '<div class="loading">加载中……</div>';
+  fetch('/api/questions?sort='+currentSort).then(function(r){return r.json()}).then(function(qs){
+    questions = qs; render();
+  }).catch(function(){
+    el.innerHTML = '<div class="empty-state"><p>加载失败，请确认服务器是否在运行</p></div>';
+  });
+}
+function render(){
+  var el = document.getElementById('q-list');
+  if(!questions.length){
+    el.innerHTML = '<div class="empty-state"><div class="icon">&#9997;</div><h3>还没有问题</h3><p>来问第一个问题吧！</p></div>';
+    return;
+  }
+  el.innerHTML = questions.map(function(q){
+    var time = timeAgo(q.created_at);
+    var bodyHtml = q.body ? '<div class="q-body">'+esc(q.body)+'</div>' : '';
+    var answersHtml = '';
+    if(q.answers && q.answers.length){
+      answersHtml += '<div class="a-count">'+q.answers.length+' 个回答'+'</div>';
+      q.answers.forEach(function(a){
+        answersHtml += '<div class="a-item"><div class="a-body">'+esc(a.body)+'</div><div class="a-meta">'+timeAgo(a.created_at)+'<button class="del-btn" onclick="deleteAnswer('+a.id+')" title="删除">&#10005;</button></div></div>';
+      });
+    }
+    var expandedHtml = '<div class="q-expanded"><div class="answers-section">'+answersHtml+
+      '<div class="answer-form"><textarea id="ans-'+q.id+'" placeholder="写个回答……" rows="2"></textarea>'+
+      '<button class="btn btn-primary btn-sm" onclick="submitAnswer('+q.id+')">回答</button></div></div></div>';
+    return '<div class="q-card" id="qc-'+q.id+'">'+
+      '<div class="q-card-header" onclick="toggleQuestion('+q.id+')">'+
+        '<div class="q-vote" onclick="event.stopPropagation()">'+
+          '<button onclick="vote('+q.id+',1)">&#9650;</button>'+
+          '<span class="count">'+q.vote_count+'</span>'+
+          '<button onclick="vote('+q.id+',-1)">&#9660;</button>'+
+        '</div>'+
+        '<div class="q-main">'+
+          '<div class="q-title">'+esc(q.title)+'</div>'+bodyHtml+
+          '<div class="q-meta">'+
+            '<span>'+time+'</span>'+
+            '<button class="del-btn" onclick="event.stopPropagation();deleteQuestion('+q.id+')" title="删除">&#10005;</button>'+
+            '<span class="count-wrap">&#9993; '+q.answer_count+'</span>'+
+          '</div>'+
+        '</div>'+
+      '</div>'+expandedHtml+'</div>';
+  }).join('');
+}
+function toggleQuestion(id){
+  var card = document.getElementById('qc-'+id);
+  card.classList.toggle('expanded');
+}
+function switchSort(sort){
+  if(sort === currentSort) return;
+  currentSort = sort;
+  document.querySelectorAll('.sort-btn').forEach(function(b){b.classList.toggle('active', b.dataset.sort===sort)});
+  load();
+}
+function vote(id, delta){
+  fetch('/api/questions/'+id+'/vote', {
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({delta:delta})
+  }).then(function(r){return r.json()}).then(function(d){
+    if(d.vote_count !== undefined){
+      for(var i=0;i<questions.length;i++){
+        if(questions[i].id===id){questions[i].vote_count=d.vote_count;break;}
+      }
+      render();
+    }
+  }).catch(function(){toast('投票失败')});
+}
+function openForm(){document.getElementById('askModal').classList.add('open');
+document.getElementById('qTitle').focus()}
+function closeForm(){document.getElementById('askModal').classList.remove('open');
+document.getElementById('qTitle').value='';document.getElementById('qBody').value=''}
+function submitQuestion(){
+  var title = document.getElementById('qTitle').value.trim();
+  var body = document.getElementById('qBody').value.trim();
+  if(!title){toast('请输入问题标题');return}
+  fetch('/api/questions', {
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({title:title,body:body})
+  }).then(function(r){
+    if(r.ok){closeForm();load();toast('问题已发布！')}
+    else{toast('发布失败')}
+  }).catch(function(){toast('发布出错')});
+}
+function submitAnswer(qid){
+  var ta = document.getElementById('ans-'+qid);
+  var body = ta.value.trim();
+  if(!body){toast('请写点内容');return}
+  fetch('/api/questions/'+qid+'/answers', {
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({body:body})
+  }).then(function(r){
+    if(r.ok){ta.value='';load();toast('回答已发布！')}
+    else{toast('发布失败')}
+  }).catch(function(){toast('发布出错')});
+}
+function deleteQuestion(id){
+  if(!confirm('确定要删除这个问题吗？')) return;
+  fetch('/api/questions/'+id,{method:'DELETE'}).then(function(r){
+    if(r.ok){load();toast('已删除')}
+    else{toast('删除失败')}
+  }).catch(function(){toast('删除失败')});
+}
+function deleteAnswer(id){
+  if(!confirm('确定要删除这个回答吗？')) return;
+  fetch('/api/answers/'+id,{method:'DELETE'}).then(function(r){
+    if(r.ok){load();toast('已删除')}
+    else{toast('删除失败')}
+  }).catch(function(){toast('删除失败')});
+}
+function toast(msg){
+  var t=document.getElementById('toast');
+  t.textContent=msg;t.classList.add('show');
+  clearTimeout(t._hide);t._hide=setTimeout(function(){t.classList.remove('show')},2000);
+}
+function esc(s){var d=document.createElement('div');d.textContent=s;return d.innerHTML}
+function timeAgo(iso){
+  if(!iso)return '';
+  var ms = new Date(iso).getTime();
+  var diff = Math.floor((Date.now()-ms)/1000);
+  if(diff<60)return '刚刚';
+  if(diff<3600)return Math.floor(diff/60)+'分钟前';
+  if(diff<86400)return Math.floor(diff/3600)+'小时前';
+  if(diff<2592000)return Math.floor(diff/86400)+'天前';
+  return new Date(iso).toLocaleDateString();
+}
+load();
+</script>
+</body>
+</html>
